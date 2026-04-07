@@ -10,11 +10,10 @@ import openpyxl
 st.set_page_config(page_title="RTV Helicópteros PRO", layout="wide", page_icon="🚁")
 # --- SISTEMA DE SEGURIDAD Y ACCESO (EL GUARDIÁN) ---
 # Aquí defines quién entra y cuál es su PIN. Luego puedes agregar a todos los pilotos.
-USUARIOS_PERMITIDOS = {
-    "ADMINISTRADOR": "0000",
-    "GUTIERREZ VALLEJOS NELSON": "1234",
-    "MARTINEZ GUTIERREZ JOSE": "5678"
-}
+# --- SISTEMA DE SEGURIDAD DESDE LA BÓVEDA ---
+# --- SISTEMA DE SEGURIDAD DESDE LA BÓVEDA ---
+usuarios_pines = st.secrets["pilotos"]
+usuarios = list(usuarios_pines.keys())
 
 # Inicializamos el estado del candado
 if 'autenticado' not in st.session_state:
@@ -26,12 +25,14 @@ if not st.session_state.autenticado:
     st.markdown("Por favor, identifíquese para iniciar su turno operativo.")
     
     with st.form("formulario_login"):
-        usuario_intento = st.selectbox("Piloto / Operador", list(USUARIOS_PERMITIDOS.keys()))
+        # 1. Aquí conectamos la caja desplegable con la nueva lista 'usuarios'
+        usuario_intento = st.selectbox("Piloto / Operador", usuarios)
         pin_intento = st.text_input("PIN de 4 dígitos", type="password")
         boton_login = st.form_submit_button("Ingresar al Sistema", type="primary")
         
         if boton_login:
-            if USUARIOS_PERMITIDOS.get(usuario_intento) == pin_intento:
+            # 2. Aquí verificamos el PIN contra la nueva bóveda 'usuarios_pines'
+            if usuarios_pines.get(usuario_intento) == pin_intento:
                 st.session_state.autenticado = True
                 st.session_state.usuario_actual = usuario_intento
                 st.rerun() # Esto recarga la página y abre el candado
