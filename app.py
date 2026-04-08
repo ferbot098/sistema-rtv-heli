@@ -35,12 +35,18 @@ if not st.session_state.autenticado:
             pin_ingresado_hash = hashlib.sha256(pin_intento.encode()).hexdigest()
             
             # Comparamos hash contra hash
-            if usuarios_pines.get(usuario_intento) == pin_ingresado_hash:
+            hash_guardado = usuarios_pines.get(usuario_intento)
+            
+            if hash_guardado == pin_ingresado_hash:
                 st.session_state.autenticado = True
                 st.session_state.usuario_actual = usuario_intento
                 st.rerun() # Esto recarga la página y abre el candado
             else:
                 st.error("❌ PIN incorrecto. Intente nuevamente.")
+                # --- LÍNEAS FORENSES TEMPORALES ---
+                st.warning(f"1. Lo que tienes guardado en secrets.toml: {hash_guardado}")
+                st.info(f"2. Lo que tu código acaba de generar: {pin_ingresado_hash}")
+                # -----------------------------------
     
     # EL COMANDO LETAL: Si no está autenticado, la ejecución muere aquí.
     st.stop()
