@@ -5,12 +5,12 @@ import io
 from datetime import datetime
 from openpyxl.styles import PatternFill, Font, Alignment, Border, Side
 import openpyxl
+import hashlib
 
 # --- CONFIGURACIÓN DE LA APP ---
 st.set_page_config(page_title="RTV Helicópteros PRO", layout="wide", page_icon="🚁")
 # --- SISTEMA DE SEGURIDAD Y ACCESO (EL GUARDIÁN) ---
 # Aquí defines quién entra y cuál es su PIN. Luego puedes agregar a todos los pilotos.
-# --- SISTEMA DE SEGURIDAD DESDE LA BÓVEDA ---
 # --- SISTEMA DE SEGURIDAD DESDE LA BÓVEDA ---
 usuarios_pines = st.secrets["pilotos"]
 usuarios = list(usuarios_pines.keys())
@@ -31,8 +31,11 @@ if not st.session_state.autenticado:
         boton_login = st.form_submit_button("Ingresar al Sistema", type="primary")
         
         if boton_login:
-            # 2. Aquí verificamos el PIN contra la nueva bóveda 'usuarios_pines'
-            if usuarios_pines.get(usuario_intento) == pin_intento:
+            # Encriptamos el intento del usuario en tiempo real
+            pin_ingresado_hash = hashlib.sha256(pin_intento.encode()).hexdigest()
+            
+            # Comparamos hash contra hash
+            if usuarios_pines.get(usuario_intento) == pin_ingresado_hash:
                 st.session_state.autenticado = True
                 st.session_state.usuario_actual = usuario_intento
                 st.rerun() # Esto recarga la página y abre el candado
@@ -277,4 +280,3 @@ if st.checkbox("Ver Base de Datos Histórica"):
         st.dataframe(pd.read_csv("BASE_DE_DATOS_VUELOS.csv"))
     else:
         st.info("Aún no hay registros en la base de datos.")
-
